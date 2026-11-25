@@ -1,47 +1,64 @@
 # IndustryOR GurobiPy benchmark
 
-This repository contains independent GurobiPy formulations for all 99 problems in OptiMind's cleaned IndustryOR CSV. Each script runs on its own and prints the optimal objective value. Script numbers refer to one-based CSV data rows, excluding the header.
+## Overview
 
-## Quick start
+This standalone benchmark pairs all 99 problems in OptiMind's cleaned IndustryOR release with independent GurobiPy models. Each model runs on its own and prints the optimal objective value.
+
+## Usage
+
+### Installation
 
 Run these commands from the repository root. The committed results were generated with Python 3.14.3 and GurobiPy 14.0.0. The package's bundled license was sufficient for all 99 models. [GurobiPy installation guide](https://support.gurobi.com/hc/en-us/articles/360044290292-How-do-I-install-Gurobi-for-Python)
 
 ```sh
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python solutions/problem_003.py
-.venv/bin/python verify.py 3
-.venv/bin/python verify.py --report verification.local.csv
 ```
 
-Pass row numbers to verify a subset. With no row numbers, `verify.py` checks every row. It compares the computed and reference objectives using `abs(computed - expected) / (1 + abs(expected)) < 1e-6`. The full run returns exit status 1 because three reference values differ, as documented below. [OptiMind evaluation metric](https://arxiv.org/pdf/2509.22979#page=7)
+### Running evaluations
 
-## Repository layout
+```sh
+.venv/bin/python solutions/problem_001.py
+.venv/bin/python eval.py 1 2
+.venv/bin/python eval.py --report verification.local.csv
+.venv/bin/python eval.py --dataset upstream
+```
+
+The evaluator defaults to the corrected dataset. Pass row numbers to evaluate a subset or omit them to run all 99. The evaluator compares objectives using `abs(computed - expected) / (1 + abs(expected)) < 1e-6` and exits with status 1 when any row fails to match. The full corrected run reports the known discrepancy on row 030. The original `verify.py` command accepts the same arguments. [OptiMind evaluation metric](https://arxiv.org/pdf/2509.22979#page=7)
+
+## Data and Benchmarks
+
+Both datasets use the fields `problem_class`, `question`, and `answer`. Problem IDs refer to one-based CSV data rows, excluding the header, and match the numbers in the solution filenames.
 
 | Path | Contents |
 | --- | --- |
-| [data/](data/) | Benchmark CSV, source attribution, and upstream license notices |
+| [data/industryor_corrected.csv](data/industryor_corrected.csv) | Default benchmark dataset |
+| [data/optimind_cleaned_classified_industryor.csv](data/optimind_cleaned_classified_industryor.csv) | OptiMind's cleaned dataset, preserved as released |
+| [data/comparisons/](data/comparisons/) | Dataset changes and reference answer comparisons |
+| [eval.py](eval.py) and [eval_utils/](eval_utils/) | Evaluation command and objective comparison logic |
 | [solutions/](solutions/) | Numbered GurobiPy models with their instance data |
-| [verify.py](verify.py) | Objective comparison and optional CSV output |
-| [reports/](reports/) | Committed verification results and the note for OptiMind maintainers |
+| [reports/](reports/) | Verification results and the report for OptiMind maintainers |
 
-## Verification results
+The evaluation entry point and comparison directory follow OptiMind's benchmark layout. [OptiMind project](https://github.com/microsoft/OptiGuide/tree/main/optimind)
 
-All 99 models reached Gurobi's optimal status. The report records 96 matches and three discrepancies against **OptiMind's cleaned CSV**. [Verification CSV](reports/verification.csv) · [Report for OptiMind maintainers](reports/optimind_industryor_report.md)
+## Dataset Cleaning Comparisons
 
-The original labels below come from the snapshot recorded in OptiMind's cleaning comparison. CardinalOperations has since revised its own release. [OptiMind comparison](https://github.com/microsoft/OptiGuide/blob/main/optimind/data/comparisons/industryOR_original_vs_ours.html) · [CardinalOperations dataset](https://huggingface.co/datasets/CardinalOperations/IndustryOR/blob/main/IndustryOR.json) · [Revision b008119](https://huggingface.co/datasets/CardinalOperations/IndustryOR/commit/b00811923f167cdf4ae1677c33cd61d4eea78f48)
+**The corrected edition rewrites the statements and updates the reference answers for problems 001 and 002.** Problem 001 specifies free inventory carryover and zero ending inventory and backlog. Problem 002 defines the objective as new machines assigned to operations immediately upon delivery and spells out the timing of training and transfers. [Statement changes and answer comparisons](data/comparisons/industryor_optimind_vs_corrected.md)
 
-| Cleaned CSV row | Original label | OptiMind cleaned label | CardinalOperations revision | Computed |
-| --- | ---: | ---: | --- | ---: |
-| [001](solutions/problem_001.py) | 219,816 | 219,816 | 219,888 | 219,600 |
-| [002](solutions/problem_002.py) | 125 | 1,350 | 125 for a two-year question | 225 |
-| [030](solutions/problem_030.py) | 1,146.39 | 1,190.38 | 1,190.41 | 1,190.41 |
+## Verification Results
 
-- **001.** The statement leaves inventory carryover unspecified. An independently checked schedule costs 219,600 yuan and fills every order on time by carrying 3,480 kg of food II from week 1 to week 2 and 240 kg from week 4 to week 6. Passing `allow_advance_production=False` to `solve()` gives 219,888 yuan, matching the CardinalOperations revision.
-- **002.** The cleaned formula counts new allocations. Year 1 contributes zero, so the maximum is `9 × 25 = 225`, and a feasible assignment attains it. Counting active stock across years gives 1,325.
-- **030.** Exact enumeration of whole-unit production confirms 1,190.41 yuan at the stated hourly rates. The optimum produces 1,430, 500, and 324 units of products I, II, and III for a 3,000.20 yuan margin before 1,809.79 yuan in machine costs. Passing `prorate_full_load_cost=True` to `solve()` uses rates derived from the full-load costs and gives 1,146.4142 yuan. The CardinalOperations revision uses the hourly column.
+All 99 models reached Gurobi's optimal status in both evaluations.
 
-## Modeling assumptions
+| Reference dataset | Matches | Rows with discrepancies | Results |
+| --- | ---: | --- | --- |
+| Corrected IndustryOR | 98/99 | 030 | [Corrected verification](reports/verification.csv) |
+| OptiMind cleaned IndustryOR | 96/99 | 001, 002, 030 | [Upstream verification](reports/verification_upstream.csv) |
+
+For row 030, exact enumeration of whole-unit production confirms **1,190.41 yuan** at the stated hourly rates. The optimum produces 1,430, 500, and 324 units of products I, II, and III, giving a 3,000.20 yuan margin before 1,809.79 yuan in machine costs. Both bundled datasets record the OptiMind reference of **1,190.38 yuan** for this row. [GurobiPy model](solutions/problem_030.py) · [CardinalOperations correction](https://huggingface.co/datasets/CardinalOperations/IndustryOR/commit/8b0d8a536845b804233b62eccec12a597005d0b4) · [Report for OptiMind maintainers](reports/optimind_industryor_report.md)
+
+The original IndustryOR snapshot lists 1,146.39 yuan for row 030. The model gives 1,146.4142 yuan with `prorate_full_load_cost=True`, which derives hourly rates from the full-load cost column. [OptiMind cleaning comparison](https://github.com/microsoft/OptiGuide/blob/main/optimind/data/comparisons/industryOR_original_vs_ours.html)
+
+### Modeling assumptions
 
 | Row | Interpretation used by the script |
 | --- | --- |
@@ -53,3 +70,11 @@ The original labels below come from the snapshot recorded in OptiMind's cleaning
 | 067 | Both yards distribute their entire monthly receipts. If receipts can remain at the yards, the minimum transport cost falls from 1,030 to 895 ton-kilometers. |
 | 070 | A factory-to-location assignment uses the volume and cost in the corresponding table cells. |
 | 096 | Market demand limits sales, giving a profit of 450 thousand yuan. Requiring both demands to be fully met gives 350 thousand yuan. |
+
+## License
+
+IndustryOR is released under CC BY-NC 4.0. The data directory records the source attribution, dataset changes, and the OptiMind project's MIT notice. [Data provenance and license notices](data/README.md)
+
+## Citation
+
+Cite ORLM for the original IndustryOR benchmark and OptiMind for the cleaned dataset. [ORLM paper](https://arxiv.org/abs/2405.17743) · [OptiMind paper](https://arxiv.org/abs/2509.22979)

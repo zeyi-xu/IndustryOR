@@ -1,2 +1,4 @@
 data/optimind_cleaned_classified_industryor.csv -text
+data/industryor_corrected.csv -text
 reports/verification.csv -text
+reports/verification_upstream.csv -text

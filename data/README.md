@@ -1,6 +1,9 @@
 # Data provenance and attribution
 
-The bundled CSV is a byte-for-byte snapshot of OptiMind's cleaned IndustryOR release. It contains 99 problems and their reference objective values. Its SHA-256 is `fd80b3061e13edc040a7ff395f4f664fd761ad26b651e5dc8dcbbd7d3a48b427`. [OptiMind source CSV](https://github.com/microsoft/OptiGuide/blob/main/optimind/data/optimind_cleaned_classified_industryor.csv)
+Both bundled CSVs contain 99 problems and use the same field names and row order.
+
+- **Corrected IndustryOR.** The local edition updates the statements and objectives for rows 001 and 002. Its SHA-256 is `35b1fdac0bc4578feff61e0c6645f8eb08043be69f2d23938120010a6cab4b66`. [Corrected CSV](industryor_corrected.csv) · [Statement changes](comparisons/industryor_optimind_vs_corrected.md)
+- **OptiMind cleaned IndustryOR.** This byte-for-byte upstream snapshot has SHA-256 `fd80b3061e13edc040a7ff395f4f664fd761ad26b651e5dc8dcbbd7d3a48b427`. [Bundled snapshot](optimind_cleaned_classified_industryor.csv) · [OptiMind source CSV](https://github.com/microsoft/OptiGuide/blob/main/optimind/data/optimind_cleaned_classified_industryor.csv)
 
 CardinalOperations introduced IndustryOR with *ORLM*. The OptiMind authors released the cleaned adaptation and a comparison documenting changes to the original dataset. [ORLM paper](https://arxiv.org/abs/2405.17743) · [OptiMind paper](https://arxiv.org/abs/2509.22979) · [Cleaning comparison](https://github.com/microsoft/OptiGuide/blob/main/optimind/data/comparisons/industryOR_original_vs_ours.html)
 

@@ -5,7 +5,7 @@ from gurobipy import GRB
 
 
 def solve(allow_advance_production: bool = True) -> float:
-    """Minimize wages and delay penalties under the chosen carryover rule.
+    """Minimize wages and delay penalties, with free inventory carryover by default.
 
     Inventory and backlog start and finish at zero. Only the original skilled
     workers serve as trainers or work overtime.
@@ -29,7 +29,7 @@ def solve(allow_advance_production: bool = True) -> float:
         trainers = model.addVars(training_starts, vtype=GRB.INTEGER, name="trainers_start")
         overtime = model.addVars(weeks, vtype=GRB.INTEGER, name="overtime_workers")
         production = model.addVars(products, weeks, name="production_kg")
-        # The statement specifies delay penalties and gives no inventory cost or limit.
+        # The corrected question permits unlimited carryover at no cost.
         stock_limit = GRB.INFINITY if allow_advance_production else 0
         inventory = model.addVars(products, weeks, ub=stock_limit, name="inventory_kg")
         backlog = model.addVars(products, weeks, name="backlog_kg")

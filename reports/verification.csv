@@ -1,6 +1,6 @@
 problem,file,expected,computed,absolute_error,status,detail
-001,solutions/problem_001.py,219816.0,219600.0,216.0,MISMATCH,
-002,solutions/problem_002.py,1350.0,225.0,1125.0,MISMATCH,
+001,solutions/problem_001.py,219600.0,219600.0,0.0,MATCH,
+002,solutions/problem_002.py,225.0,225.0,0.0,MATCH,
 003,solutions/problem_003.py,10349920.0,10349920.0,0.0,MATCH,
 004,solutions/problem_004.py,30400.0,30400.0,0.0,MATCH,
 005,solutions/problem_005.py,18.95657143,18.95657142857143,1.428571039241433e-09,MATCH,

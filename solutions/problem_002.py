@@ -45,8 +45,8 @@ def solve(count_active_stock: bool = False) -> float:
             previous_training = training[t]
             previous_operators = operators[t]
 
-        # The displayed sum uses the additions from each period. The
-        # description of unit-years can also mean the active stock in each period.
+        # The corrected question counts immediate placements from new deliveries.
+        # Active stock is available for auditing the earlier unit-years wording.
         objective = active.sum() if count_active_stock else new_active.sum()
         model.setObjective(objective, GRB.MAXIMIZE)
 
