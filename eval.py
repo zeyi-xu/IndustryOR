@@ -28,14 +28,15 @@ def main() -> int:
     args = parser.parse_args()
 
     with DATASETS[args.dataset].open(encoding="utf-8", newline="") as file:
-        expected = [float(row["answer"]) for row in csv.DictReader(file)]
-    problems = args.problems or range(1, len(expected) + 1)
-    if any(not 1 <= number <= len(expected) for number in problems):
-        parser.error(f"Problem IDs must be between 1 and {len(expected)}")
+        rows = list(csv.DictReader(file, restval=""))
+    problems = args.problems or range(1, len(rows) + 1)
+    if any(not 1 <= number <= len(rows) for number in problems):
+        parser.error(f"Problem IDs must be between 1 and {len(rows)}")
 
     results = []
     for number in problems:
-        result = check_problem(number, expected[number - 1])
+        row = rows[number - 1]
+        result = check_problem(number, float(row["answer"]), model_file=row.get("model_file"))
         results.append(result)
         print(
             f"{result['problem']} {result['status']:8} "

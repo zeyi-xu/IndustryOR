@@ -9,22 +9,26 @@ ROOT = Path(__file__).resolve().parents[1]
 TOLERANCE = 1e-6
 
 
-def check_problem(number: int, expected: float) -> dict:
-    module_name = f"problem_{number:03d}"
+def check_problem(number: int, expected: float, model_file: str | None = None) -> dict:
+    filename = f"problem_{number:03d}.py" if model_file is None else model_file
+    path = Path(filename)
     result = {
         "problem": f"{number:03d}",
-        "file": f"solutions/{module_name}.py",
+        "file": f"data/{filename}",
         "expected": expected,
         "computed": "",
         "absolute_error": "",
         "status": "MISSING",
         "detail": "",
     }
+    if path.name != filename or path.suffix != ".py" or not path.stem.isidentifier():
+        result.update(status="ERROR", detail=f"Invalid Python model filename {filename!r}")
+        return result
     if not (ROOT / result["file"]).is_file():
         return result
 
     try:
-        computed = float(import_module(f"solutions.{module_name}").solve())
+        computed = float(import_module(f"data.{path.stem}").solve())
         if not isfinite(computed):
             raise ValueError(f"Non-finite objective {computed}")
     except Exception as exc:

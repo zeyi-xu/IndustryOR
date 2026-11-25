@@ -4,8 +4,8 @@ This edition corrects the statements and reference answers for problems **001** 
 
 | Row | Original IndustryOR reference | OptiMind reference | Corrected reference | Statement change |
 | --- | ---: | ---: | ---: | --- |
-| [001](../../solutions/problem_001.py) | 219,816 yuan | 219,816 yuan | **219,600 yuan** | Specify free inventory carryover, clear all orders and inventory by week 8, and define training and overtime eligibility. |
-| [002](../../solutions/problem_002.py) | 125 | 1,350 | **225** | Define the ten-year objective as immediate assignments from new deliveries and specify operator availability and equipment transfers. |
+| [001](../problem_001.py) | 219,816 yuan | 219,816 yuan | **219,600 yuan** | Specify free inventory carryover, clear all orders and inventory by week 8, and define training and overtime eligibility. |
+| [002](../problem_002.py) | 125 | 1,350 | **225** | Define the ten-year objective as immediate assignments from new deliveries and specify operator availability and equipment transfers. |
 
 The original references come from the historical snapshot in OptiMind's comparison. [OptiMind cleaning comparison](https://github.com/microsoft/OptiGuide/blob/main/optimind/data/comparisons/industryOR_original_vs_ours.html)
 
